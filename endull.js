@@ -20,13 +20,6 @@ var Client = require('node-rest-client').Client;
 var config = {
 	hasDictionaryDef: false,
 	relationshipTypes: "verb-form",
-	minCorpusCount: 0,
-	maxCorpusCount: -1,
-	minDictionaryCount: 1,
-	maxDictionaryCount: -1,
-	minLength: 5,
-	maxLength: -1,
-	limit: 2,
 	api_key: APIKEY
 };
 
@@ -61,8 +54,9 @@ var config = {
         }
 
         if (continuous_form){
+          var toTitleCase = require('to-title-case');
           var words = [adjective, " ", object, " of ", continuous_form];
-          console.log(words.join(""));
+          console.log(toTitleCase(words.join("")));
 
         }
       }
