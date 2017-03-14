@@ -1,0 +1,4 @@
+{
+   "wordnik_api_key": YOUR_KEY_HERE,
+   "corpora_location": WHERE_CORPORA_LIVES // cf https://github.com/dariusk/corpora
+}
