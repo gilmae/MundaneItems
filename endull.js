@@ -1,5 +1,6 @@
 var toTitleCase = require('to-title-case');
 var Client = require('node-rest-client').Client;
+var Twit = require('twit');
 
 var config = require('./.config')
 
@@ -7,15 +8,14 @@ var verbs = require(config.corpora_location + 'data/words/verbs');
 var adjectives = require(config.corpora_location + 'data/words/adjs.json');
 var objects = require(config.corpora_location + 'data/objects/objects.json');
 var appliances = require(config.corpora_location + 'data/technology/appliances.json');
-var monsters = require(config.corpora_location + 'data/mythology/monsters.json');
+var animals = require(config.corpora_location + 'data/animals/common.json');
 var personal_nouns = require(config.corpora_location + 'data/words/personal_nouns.json');
 var nouns = require(config.corpora_location + 'data/words/nouns.json');
+var clothes = require(config.corpora_location + 'data/objects/clothing.json');
 
 var items = objects.objects.concat(appliances.appliances);
 var actions = personal_nouns.personalNouns.filter(function(word){return word.endsWith("er");})
 var traits = nouns.nouns.filter(function(word){return word.endsWith("ity") || word.endsWith("ness");})
-
-console.log();
 
 var WORDNIK_APIKEY = config.wordnik_api_key;
 
@@ -69,7 +69,13 @@ function getContinuousForm(word) {
 )};
 
 function write(words) {
-	console.log(toTitleCase(words.join("")));
+	T.post('statuses/update', { status: toTitleCase(words.join("")) }, function(err, data, response) {
+	  console.log(data)
+	});
+}
+
+function writeToConsole(words) {
+	  console.log(toTitleCase(words.join("")))
 }
 
 function getAdjective() {
@@ -100,6 +106,12 @@ function getObject() {
 	})
 }
 
+function getClothing() {
+	return new Promise(function(resolve, reject){
+		resolve(clothes.clothes[Math.floor(Math.random() * clothes.clothes.length)])
+	})
+}
+
 function getAction() {
 	return new Promise(function(resolve, reject){
 		resolve(actions[Math.floor(Math.random() * actions.length)])
@@ -114,7 +126,7 @@ function getTrait() {
 
 function getMonster() {
 	return new Promise(function(resolve, reject){
-		resolve(monsters.names[Math.floor(Math.random() * monsters.names.length)])
+		resolve(animals.animals[Math.floor(Math.random() * animals.animals.length)])
 	})
 }
 
@@ -158,14 +170,26 @@ function objectPlusBonusAction() {
 	build([getObject(), getString(" +" ), getString(Math.floor(Math.random()*5+1)), getString(", "), getAction()]);
 }
 
+function clothingOfTheMonster() {
+	build([getClothing(), getString(" of the "), getMonster()]);
+}
+
 var endullments = [objectOfMonsterTrait,
 	objectOfVerbingMonsters,
 	adjectiveObjectOfVerbing,
 	objectOfAdjectiveVerbing,
 	objectOfVerbingAndVerbing,
 	objectPlusBonus,
-	objectPlusBonusAction
+	objectPlusBonusAction,
+	clothingOfTheMonster
 ]
 
-var which = Math.floor(Math.random()*endullments.length);
-endullments[which]();
+var T = new Twit(config.twitter);
+
+function rollUpItem() {
+	var which = Math.floor(Math.random()*endullments.length);
+	endullments[which]();
+}
+
+rollUpItem();
+setInterval(rollUpItem, 1000 * 60 * 60);
