@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/gilmae/MundaneItems/issues"
   },
-  "homepage": "https://github.com/gilmae/MundaneItems#readme"
+  "homepage": "https://github.com/gilmae/MundaneItems#readme",
+  "dependencies": {
+    "to-title-case": "2.14.12"
+    "node-rest-client": "4.4.7"
+    "twit": ">0.12.0"
+  }
 }
