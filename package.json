@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/gilmae/MundaneItems#readme",
   "dependencies": {
-    "to-title-case": "2.14.12"
-    "node-rest-client": "4.4.7"
+    "corpora-project": "^0.2.0",
+    "node-rest-client": "4.4.7",
+    "pluralize": "^4.0.0",
+    "to-title-case": "2.14.12",
     "twit": ">0.12.0"
   }
 }

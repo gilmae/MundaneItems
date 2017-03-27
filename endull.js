@@ -1,6 +1,8 @@
 var toTitleCase = require('to-title-case');
 var Client = require('node-rest-client').Client;
 var Twit = require('twit');
+var corpora = require('corpora-project');
+var pluralize = require('pluralize')
 
 var config = require('./.config')
 
@@ -13,9 +15,19 @@ var personal_nouns = require(config.corpora_location + 'data/words/personal_noun
 var nouns = require(config.corpora_location + 'data/words/nouns.json');
 var clothes = require(config.corpora_location + 'data/objects/clothing.json');
 
+var firstNames = require(config.corpora_location + 'data/humans/firstNames.json');
+var lastNames = require(config.corpora_location + 'data/humans/lastNames.json');
+
+var honorifics = require(config.corpora_location + 'data/humans/englishHonorifics.json');
+var occupations = require(config.corpora_location + 'data/humans/occupations.json');
+
+var creatures_with_adjectives = require(config.corpora_location + 'data/animals/collateral_adjectives.json');
+var creatureJobs = honorifics.englishHonorifics.concat(occupations.occupations);
+
 var items = objects.objects.concat(appliances.appliances);
 var actions = personal_nouns.personalNouns.filter(function(word){return word.endsWith("er");})
 var traits = nouns.nouns.filter(function(word){return word.endsWith("ity") || word.endsWith("ness");})
+
 
 var WORDNIK_APIKEY = config.wordnik_api_key;
 
@@ -89,7 +101,15 @@ function getAdjective() {
 function getVerb() {
 	return new Promise(function(resolve, reject){
 		resolve(
-			verbs.verbs[Math.floor(Math.random() * verbs["verbs"].length)].present
+			verbs.verbs[Math.floor(Math.random() * verbs.verbs.length)].present
+		)
+	})
+}
+
+function getNoun() {
+	return new Promise(function(resolve, reject){
+		resolve(
+			nouns.nouns[Math.floor(Math.random() * nouns.nouns.length)]
 		)
 	})
 }
@@ -127,6 +147,38 @@ function getTrait() {
 function getMonster() {
 	return new Promise(function(resolve, reject){
 		resolve(animals.animals[Math.floor(Math.random() * animals.animals.length)])
+	})
+}
+
+function getAnimalCollateralAdjective() {
+	return new Promise(function(resolve, reject){
+		var animal = creatures_with_adjectives.animals[Math.floor(Math.random() * creatures_with_adjectives.animals.length)];
+    var adjs = animal.collateral_adjectives;
+		resolve(adjs[Math.floor(Math.random() * adjs.length)]);
+	})
+}
+
+function getLastName() {
+	return new Promise(function(resolve, reject){
+		resolve(firstNames.firstNames[Math.floor(Math.random() * firstNames.firstNames.length)])
+	})
+}
+
+function getFirstName() {
+	return new Promise(function(resolve, reject){
+		resolve(lastNames.lastNames[Math.floor(Math.random() * lastNames.lastNames.length)])
+	})
+}
+
+function getJob() {
+	return new Promise(function(resolve, reject){
+		resolve(creatureJobs[Math.floor(Math.random() * creatureJobs.length)])
+	})
+}
+
+function getPlural(word) {
+	return new Promise(function(resolve, reject){
+		resolve(pluralize.plural(word))
 	})
 }
 
@@ -174,6 +226,21 @@ function clothingOfTheMonster() {
 	build([getClothing(), getString(" of the "), getMonster()]);
 }
 
+function objectOfName(){
+	var elements = [getObject(), getString(" of "), getFirstName()];
+	if (Math.random() > .66) {
+		elements = elements.concat([getString(" "), getLastName()])
+	}
+
+	build(elements);
+}
+
+function objectOfCreatureJobs() {
+	build([getObject(), getString(" of the "), getAnimalCollateralAdjective(), getString(" "), getJob().then(getPlural)])
+}
+
+
+
 var endullments = [objectOfMonsterTrait,
 	objectOfVerbingMonsters,
 	adjectiveObjectOfVerbing,
@@ -181,7 +248,9 @@ var endullments = [objectOfMonsterTrait,
 	objectOfVerbingAndVerbing,
 	objectPlusBonus,
 	objectPlusBonusAction,
-	clothingOfTheMonster
+	clothingOfTheMonster,
+	objectOfName,
+	objectOfCreatureJobs
 ]
 
 var T = new Twit(config.twitter);
