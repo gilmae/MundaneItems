@@ -158,13 +158,13 @@ function getAnimalCollateralAdjective() {
 	})
 }
 
-function getLastName() {
+function getFirstName() {
 	return new Promise(function(resolve, reject){
 		resolve(firstNames.firstNames[Math.floor(Math.random() * firstNames.firstNames.length)])
 	})
 }
 
-function getFirstName() {
+function getLastName() {
 	return new Promise(function(resolve, reject){
 		resolve(lastNames.lastNames[Math.floor(Math.random() * lastNames.lastNames.length)])
 	})
